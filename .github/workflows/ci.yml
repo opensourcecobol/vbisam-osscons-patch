@@ -1,0 +1,29 @@
+name: build
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened, review_requested, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential
+
+      - name: Build
+        run: |
+          ./configure --prefix=/usr/
+          make
+          sudo make install
